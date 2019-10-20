@@ -56,6 +56,11 @@ case $TEST in
 		;;
 	news )
 		PAGES="https://theblaze.com https://thedailybeast.com https://independent.co.uk https://nypost.com https://salon.com https://cnn.com https://sfgate.com https://latimes.com https://mirror.co.uk https://cnet.com"
+	random20 )
+		PAGES="https://www.theguardian.com https://www.sciencedirect.com/research-recommendations https://uk.reuters.com/video/2019/09/03/uk-pm-johnson-threatens-election-ahead-o?videoId=595311898&videoChannel=75 http://www.pbs.org/black-culture/ https://www.etsy.com/uk/c/wedding-and-party?ref=catnav-10983 https://www.tmz.com/2019/09/03/youtuber-brooke-houts-no-charges-animal-cruelty-dog-abusing-video/ https://boards.4chan.org/u/ https://edition.cnn.com/sport https://www.shutterstock.com/video https://www.asos.com/women/outlet/ctas/outlet-edits/outlet-edit-2/cat/?cid=28606&nlid=ww|outlet|ctas https://www.wowhead.com/zone=9616 https://kiwifarms.net/threads/archiving-the-lolcow-wiki.53747/post-5180264 https://www.earthcam.com/usa/michigan/brighton/ https://www.samsung.com/uk/explore/productivity/life/data-detox-how-to-amp-up-your-digital-security/ https://www.earthcam.com/company/privacy.php https://platekompaniet.no/ https://edition.cnn.com http://www.sky.com/shop/store-locator http://forum.kinozal.tv/showthread.php?goto=lastpost&t=304125 https://www.ebay.co.uk/"
+		;;
+	random10 )
+		PAGES="https://www.wikihow.com/Special:CommunityDashboard https://www.xpres.co.uk/c-812-chromaluxe-aluminium-panels-xpres.aspx https://kiwifarms.net/members/loose-handle.39029/ https://www.mathletics.com/uk/for-schools/free-trial/ https://www.salon.com/2019/09/02/americas-slow-motion-coup-keeps-grinding-forward-but-is-donald-trump-really-the-one-to-blame/ https://www.salon.com/2019/09/01/planning-an-outdoor-barbecue-for-labor-day-follow-these-pro-tips-from-the-masters-of-the-craft/ https://www.marineinsight.com/category/videos/ https://sport.bt.com/more-sport-01363810551131 https://www.vice.com/en_uk/article/43kwpm/the-dm-that-changed-my-life-a-three-word-email-from-my-mum https://www.purevpn.com/dk/"
 		;;
 esac
 

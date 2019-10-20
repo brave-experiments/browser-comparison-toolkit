@@ -34,8 +34,8 @@ case $BROWSER in
 		;;
 	Opera )
 		PROCESS_NAMES="Opera"
-		EXECUTABLE="/Applications/Opera.app/Contents/MacOS/Opera"
-		APPLICATION="Opera"
+		EXECUTABLE="/Users/brave/Applications/Opera Beta.app/Contents/MacOS/Opera"
+		APPLICATION="Opera Beta"
 		;;
 	Edge )
 		PROCESS_NAMES="Microsoft Edge"
@@ -53,6 +53,9 @@ case $TEST in
 		;;
 	basic )
 		PAGES="https://www.google.com/search?q=brave https://youtube.com https://cnet.com https://amazon.com https://outlook.live.com/owa/"
+		;;
+	news )
+		PAGES="https://theblaze.com https://thedailybeast.com https://independent.co.uk https://nypost.com https://salon.com https://cnn.com https://sfgate.com https://latimes.com https://mirror.co.uk https://cnet.com"
 		;;
 esac
 

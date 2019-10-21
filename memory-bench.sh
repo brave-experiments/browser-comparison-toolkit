@@ -8,38 +8,38 @@ REPEATS=3
 case $BROWSER in
 	Brave )
 		PROCESS_NAMES="Brave Browser"
-		EXECUTABLE="/Applications/Brave Browser Beta.app/Contents/MacOS/Brave Browser Beta"
+		EXECUTABLE="/Applications/Brave Browser Nightly 2.app"
 		APPLICATION="Brave Browser"
 		;;
 	Firefox )
 		PROCESS_NAMES="firefox|plugin-container"
-		EXECUTABLE="/Applications/Firefox.app/Contents/MacOS/firefox"
+		EXECUTABLE="/Applications/Firefox.app"
 		APPLICATION="Firefox"
 		;;
 	Safari )
 		PROCESS_NAMES="Safari|WebKit"
-		EXECUTABLE="/Applications/Safari.app/Contents/MacOS/Safari"
+		EXECUTABLE="/Applications/Safari.app"
 		APPLICATION="Safari"
 		;;
 	Chrome )
 		PROCESS_NAMES="Google Chrome"
-		EXECUTABLE="/Applications/Google Chrome 3.app/Contents/MacOS/Google Chrome"
+		EXECUTABLE="/Applications/Google Chrome 3.app"
 		APPLICATION="Google Chrome 3"
 		;;
 	ChromeUBO )
 		PROCESS_NAMES="Google Chrome"
-		EXECUTABLE="/Applications/Google Chrome 3.app/Contents/MacOS/Google Chrome"
-		FLAGS="--load-extension=./uBO"
+		EXECUTABLE="/Applications/Google Chrome 3.app"
+		FLAGS="--load-extension=$(pwd)/uBO"
 		APPLICATION="Google Chrome 3"
 		;;
 	Opera )
 		PROCESS_NAMES="Opera"
-		EXECUTABLE="/Users/brave/Applications/Opera Beta.app/Contents/MacOS/Opera"
+		EXECUTABLE="/Users/brave/Applications/Opera Beta.app"
 		APPLICATION="Opera Beta"
 		;;
 	Edge )
 		PROCESS_NAMES="Microsoft Edge"
-		EXECUTABLE="/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta"
+		EXECUTABLE="/Applications/Microsoft Edge Beta.app"
 		APPLICATION="Microsoft Edge"
 		;;
 esac
@@ -56,6 +56,7 @@ case $TEST in
 		;;
 	news )
 		PAGES="https://theblaze.com https://thedailybeast.com https://independent.co.uk https://nypost.com https://salon.com https://cnn.com https://sfgate.com https://latimes.com https://mirror.co.uk https://cnet.com"
+		;;
 	random20 )
 		PAGES="https://www.theguardian.com https://www.sciencedirect.com/research-recommendations https://uk.reuters.com/video/2019/09/03/uk-pm-johnson-threatens-election-ahead-o?videoId=595311898&videoChannel=75 http://www.pbs.org/black-culture/ https://www.etsy.com/uk/c/wedding-and-party?ref=catnav-10983 https://www.tmz.com/2019/09/03/youtuber-brooke-houts-no-charges-animal-cruelty-dog-abusing-video/ https://boards.4chan.org/u/ https://edition.cnn.com/sport https://www.shutterstock.com/video https://www.asos.com/women/outlet/ctas/outlet-edits/outlet-edit-2/cat/?cid=28606&nlid=ww|outlet|ctas https://www.wowhead.com/zone=9616 https://kiwifarms.net/threads/archiving-the-lolcow-wiki.53747/post-5180264 https://www.earthcam.com/usa/michigan/brighton/ https://www.samsung.com/uk/explore/productivity/life/data-detox-how-to-amp-up-your-digital-security/ https://www.earthcam.com/company/privacy.php https://platekompaniet.no/ https://edition.cnn.com http://www.sky.com/shop/store-locator http://forum.kinozal.tv/showthread.php?goto=lastpost&t=304125 https://www.ebay.co.uk/"
 		;;
@@ -66,7 +67,7 @@ esac
 
 for (( i = 0; i < $REPEATS; i++ )); do
 	
-	"$EXECUTABLE" ${FLAGS} > /dev/null 2>&1 &
+	open -a "$EXECUTABLE" --args ${FLAGS} #> /dev/null 2>&1 &
 	sleep 3  # Wait a little bit for the app to start
 	IFS=' ' read -r -a openpages <<< "$PAGES"
 	for url in "${openpages[@]}"

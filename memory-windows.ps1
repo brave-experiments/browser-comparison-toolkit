@@ -15,7 +15,7 @@ for ($i=1; $i -le $repeats; $i++) {
     Get-Content .\scenarios\$test.txt | ForEach-Object {
         $page = $_
         Write-Output "Opening page $page"
-        Start-Process -FilePath $browser'.exe' -ArgumentList $page
+        Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA'\BraveSoftware\Brave-Browser-Beta\Application\' -ArgumentList $page
         Start-Sleep -Seconds 5
     }
 

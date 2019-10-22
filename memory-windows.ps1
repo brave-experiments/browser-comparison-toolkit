@@ -25,6 +25,6 @@ for ($i=1; $i -le $repeats; $i++) {
 
     ("$browser $test {0:N2}MB " -f ($m.sum / 1mb))
 
-    Stop-Process -Name $browser
+    Get-Process -Name $browser | Foreach-Object { $_.CloseMainWindow() | Out-Null }
     Start-Sleep -Seconds 5
 }

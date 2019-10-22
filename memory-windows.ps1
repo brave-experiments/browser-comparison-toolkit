@@ -9,7 +9,7 @@ $repeats = 3
 $wait = 30
 
 for ($i=1; $i -le $repeats; $i++) {
-    Start-Process -FilePath $browser'.exe'
+    Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA'\BraveSoftware\Brave-Browser-Beta\Application\'
     Start-Sleep -Seconds $wait
 
     Get-Content .\scenarios\$test.txt | ForEach-Object {

@@ -27,11 +27,15 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
 
         Start-Sleep -Seconds $wait
 
-        $m = ps $browser | measure PM -Sum
+        # $m = ps $browser | measure PM -Sum
 
+        $m = Get-Counter -Counter "\Process($($browser)*)\Working Set - Private" |
+            Select -expand CounterSamples |
+            Measure-Object -sum CookedValue
+        
         ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
 
-        Get-Process -Name $browser | Foreach-Object { $_.CloseMainWindow() | Out-Null } | Stop-Process
+        Get-Process -Name $browser | Foreach-Object { $_.CloseMainWindow() | Out-Null } | Stop-Process -Force
         Start-Sleep -Seconds 5
     }
 }

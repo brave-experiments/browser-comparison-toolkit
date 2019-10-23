@@ -9,7 +9,7 @@ $repeats = 3
 $wait = 30
 $braveapplication = '\BraveSoftware\Brave-Browser-Beta\Application\'
 
-Get-ChildItem ".\scenarios\" -Filter $test*.log | Foreach-Object {
+Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
     $fullname = $_.FullName
     $test = $_.Name
     

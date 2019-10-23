@@ -6,15 +6,12 @@ TEST=$2
 case $BROWSER in
 	Brave )
 		LAUNCH=(--chrome.binaryPath /Applications/Brave\ Browser\ Beta.app/Contents/MacOS/Brave\ Browser\ Beta)
-		FLAGS="--chrome.chromedriverPath=$(pwd)/chromedriver"
+		# FLAGS="--chrome.chromedriverPath=$(pwd)/chromedriver"
 		SPBROWSER="chrome"
 		;;
 	Firefox )
 		LAUNCH=(--firefox.binaryPath /Applications/Firefox.app/Contents/MacOS/firefox)
 		SPBROWSER="firefox"
-		;;
-	Safari )
-		SPBROWSER="safari"
 		;;
 	Chrome )
 		LAUNCH=(--chrome.binaryPath /Applications/Google\ Chrome\ 3.app/Contents/MacOS/Google\ Chrome)
@@ -28,8 +25,20 @@ case $BROWSER in
 		;;
 esac
 
-sitespeed.io -b $SPBROWSER "${LAUNCH[@]}" "${FLAGS[@]}" \
-	--name ${BROWSER}-${TEST} \
-	--logToFile \
-	--outputFolder sitespeed-result/${BROWSER}-${TEST} \
-	./scenarios/${TEST}.txt
+IFS=$'\n' read -d '' -r -a PAGES < $TEST
+
+for url in "${PAGES[@]}"
+do
+	browsertime -b $SPBROWSER "${LAUNCH[@]}" "${FLAGS[@]}" \
+		-n 3 \
+		--pageCompleteCheckInactivity \
+		--connectivity.engine throttle \
+		--connectivity.profile custom \
+		--connectivity.alias broadband \
+		--connectivity.downstreamKbps 30720 \
+		--connectivity.upstreamKbps 31000 \
+		--connectivity.latency 100 \
+		--viewPort maximize \
+		$url
+done
+

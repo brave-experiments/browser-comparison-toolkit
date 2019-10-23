@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 BROWSER=$1
+TESTSET=$2
 DURATION=20
 REPEATS=3
 
@@ -43,7 +44,7 @@ case $BROWSER in
 		;;
 esac
 
-for TEST in ./scenarios/*.txt
+for TEST in ./scenarios/$TESTSET*.txt
 do
   	echo "$BROWSER Processing $TEST file..."
 
@@ -53,8 +54,8 @@ do
 		
 		open -a "$EXECUTABLE" --args ${FLAGS} #> /dev/null 2>&1 &
 		sleep 3  # Wait a little bit for the app to start
-		IFS=' ' read -r -a openpages <<< "$PAGES"
-		for url in "${openpages[@]}"
+		# IFS=' ' read -r -a openpages <<< "$TEST"
+		for url in "${PAGES[@]}"
 		do
 			command="tell application \"$APPLICATION\" to open location \"$url\""
 		    osascript -e "$command"

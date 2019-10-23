@@ -15,7 +15,7 @@ Get-ChildItem ".\scenarios\" -Filter $test*.log | Foreach-Object {
     
     for ($i=1; $i -le $repeats; $i++) {
         Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA$braveapplication
-        Start-Sleep -Seconds $wait
+        Start-Sleep -Seconds 5
     
         Get-Content $fullname | ForEach-Object {
             $page = $_

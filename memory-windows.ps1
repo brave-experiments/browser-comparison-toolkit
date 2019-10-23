@@ -9,14 +9,14 @@ $repeats = 3
 $wait = 30
 $braveapplication = '\BraveSoftware\Brave-Browser-Beta\Application\'
 
-for ($i=1; $i -le $repeats; $i++) {
-    Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA$braveapplication
-    Start-Sleep -Seconds $wait
-
-    Get-ChildItem ".\scenarios\" -Filter $test*.log | 
-    Foreach-Object {
-        $fullname = $_.FullName
-        $test = $_.Name
+Get-ChildItem ".\scenarios\" -Filter $test*.log | Foreach-Object {
+    $fullname = $_.FullName
+    $test = $_.Name
+    
+    for ($i=1; $i -le $repeats; $i++) {
+        Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA$braveapplication
+        Start-Sleep -Seconds $wait
+    
         Get-Content $fullname | ForEach-Object {
             $page = $_
             Write-Output "Opening page $page"

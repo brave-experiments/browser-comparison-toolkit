@@ -29,7 +29,7 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
 
         # $m = ps $browser | measure PM -Sum
 
-        $m = Get-WmiObject -class Win32_PerfFormattedData_PerfProce_Process -filter "Name LIKE '$($browser)%'" |
+        $m = Get-WmiObject -class Win32_PerfFormattedData_PerfProc_Process -filter "Name LIKE '$($browser)%'" |
             Select -expand workingSetPrivate |
             Measure-Object -sum
         

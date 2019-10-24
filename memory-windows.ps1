@@ -29,13 +29,17 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
 
         # $m = ps $browser | measure PM -Sum
 
-        $m = Get-Counter -Counter "\Process($($browser)*)\Working Set - Private" |
-            Select -expand CounterSamples |
-            Measure-Object -sum CookedValue
+        $m = Get-WmiObject -class Win32_PerfFormattedData_PerfProce_Process -filter "Name LIKE '$($browser)%" |
+            Select -expand workingSetPrivate |
+            Measure-Object -sum
         
         ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
 
-        Get-Process -Name $browser | Foreach-Object { $_.CloseMainWindow() | Out-Null } | Stop-Process -Force
-        Start-Sleep -Seconds 5
+        $process = Get-Process -Name $browser
+        while ($process -ne $null) {
+            $process | ForEach-Object { $_.CloseMainWindow() | Out-Null } | Stop-Process -Force
+            Start-Sleep 5
+            $process = Get-Process -Name $browser -ErrorAction SilentlyContinue
+        }
     }
 }

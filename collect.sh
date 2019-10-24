@@ -1,7 +1,8 @@
-browser=$1
+dir=$1
+browser=$2
 
 echo "["
-for file in ./browsertime-Friefox/*/*/browsertime.json
+for file in $dir/*/*/browsertime.json
 do
 
     (
@@ -16,9 +17,12 @@ do
         }" $file;
         jq ".log | {
             sizes: .entries 
-                | group_by(.pageref) 
+                | group_by(.pageref)
                 | map({
-                      (.[0].pageref): map(.response ._transferSize) | add
+                      (.[0].pageref): [
+                            (map(.response | ([.headersSize, .bodySize] | add)) | add),
+                            (map(.request | ([.headersSize, .bodySize] | add)) | add)
+                        ] | add
                   })
                 | add
           }" $(dirname "$file")/$(basename "$file" .json).har

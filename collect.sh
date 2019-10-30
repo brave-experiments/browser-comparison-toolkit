@@ -11,6 +11,17 @@ do
         browsertime=$file
         if [[ -f "$browsertime" ]] && [[ -f "$har" ]]; then
             #statements
+            sizes=$(jq -r ".log | .entries
+                    | group_by(.pageref)
+                    | map([ 
+                            (map(.response | ([.headersSize, .bodySize] | add)) | add),
+                            (map(.request | ([.headersSize, .bodySize] | add)) | add)
+                        ] | add)
+                    | .[]" $har);
+            size_average=$(awk '{ sum=sum+$1 } END { avg=sum/NR; printf "%f", avg }' <<< "$sizes");
+            size_stddev=$(awk '{sum+=$0;a[NR]=$0}END{for(i in a)y+=(a[i]-(sum/NR))^2;printf "%f", sqrt(y/(NR-1))}' <<< "$sizes");
+            size_median=$(awk '{arr[NR]=$1} END {if (NR%2==1) print arr[(NR+1)/2]; else print (arr[NR/2]+arr[NR/2+1])/2}' <<< sort <<< "$sizes");
+
             (
                 jq " .[] | {
                     browser: \"$BROWSER\",
@@ -21,17 +32,15 @@ do
                     loadEvent: .statistics .timings .loadEventEnd | {median: .median, mean: .mean, stddev: .stddev},
                     fullyLoaded: .statistics .timings .fullyLoaded | {median: .median, mean: .mean, stddev: .stddev}
                 }" $browsertime;
-                jq ".log | {
-                    sizes: .entries 
-                        | group_by(.pageref)
-                        | map({
-                              (.[0].pageref): [
-                                    (map(.response | ([.headersSize, .bodySize] | add)) | add),
-                                    (map(.request | ([.headersSize, .bodySize] | add)) | add)
-                                ] | add
-                          })
-                        | add
-                  }" $har
+                
+                jq -n --arg mean "$size_average" \
+                    --arg stddev "$size_stddev" \
+                    --arg median "$size_median" \
+                    '{ size: {
+                        median: $median | tonumber,
+                        mean: $mean | tonumber,
+                        stddev: $stddev | tonumber
+                    }}'
             ) | jq -n '[inputs] | add'
             echo ","
         fi

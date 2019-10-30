@@ -7,7 +7,8 @@ $browsers = @("Chrome", "Brave", "Firefox", "Opera")
 
 Get-Content $test | ForEach-Object {
 	$page = $_
-	foreach ($browser in $browsers) {
+	for ($i=0; $i -lt $browsers.Length; $i++){
+		$browser = $browsers[$i]
 		switch ($browser)
 		{
 			"Brave" {
@@ -41,7 +42,7 @@ Get-Content $test | ForEach-Object {
 		browsertime -b $spbrowser $binaryFlag $binaryPath $driver `
 			--iterations 3 `
 			--pageCompleteCheckInactivity `
-			--resultDir browsertime/$BROWSER/4g/$i `
+			--resultDir browsertime/$BROWSER/$connectivity/$i `
 			--viewPort maximize `
 			--connectivity.alias $connectivity `
 			$page

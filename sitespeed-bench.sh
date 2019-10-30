@@ -9,7 +9,7 @@ IFS=$'\n' read -d '' -r -a PAGES < $TEST
 for i in "${!PAGES[@]}"
 do
 	url="${PAGES[$i]}"
-	for BROWSER in Chrome Brave Firefox
+	for BROWSER in Chrome Brave Firefox Opera
 	do
 		case $BROWSER in
 			Brave )
@@ -26,6 +26,11 @@ do
 				FLAGS="--chrome.chromedriverPath=$(pwd)/chromedrivers/chromedriver"
 				SPBROWSER="chrome"
 				;;
+			Opera )
+				LAUNCH=(--chrome.binaryPath /Users/brave/Applications/Opera\ Beta.app/Contents/MacOS/Opera)
+				FLAGS="--chrome.chromedriverPath=$(pwd)/chromedrivers/operadriver"
+				SPBROWSER="chrome"
+				;;
 			ChromeUBO )
 				LAUNCH=(--chrome.binaryPath /Applications/Google\ Chrome\ 3.app/Contents/MacOS/Google\ Chrome)
 				FLAGS=(--chrome.chromedriverPath=$(pwd)/chromedrivers/chromedriver --chrome.args load-extension=$(pwd)/uBO)
@@ -36,11 +41,11 @@ do
 		browsertime -b $SPBROWSER "${LAUNCH[@]}" "${FLAGS[@]}" \
 			-n 3 \
 			--pageCompleteCheckInactivity \
-			--resultDir browsertime/$BROWSER/unthrottled-warm/$i \
+			--resultDir browsertime/$BROWSER/4g/$i \
 			--viewPort maximize \
 			--connectivity.alias unthrottled \
-			--preURL $url \
-			$url			
+			$url
+						# --preURL $url \
 	done
 done
 

@@ -1,8 +1,9 @@
 dir=$1
 browser=$2
+scenario=$3
 
-echo "["
-for file in $dir/*/*/browsertime.json
+(echo "["
+for file in $dir/$browser/$scenario/*/browsertime.json
 do
 
     (
@@ -30,4 +31,6 @@ do
     echo ","
 
 done
-echo "]"
+echo "]") > $browser-$scenario.json
+
+

@@ -9,7 +9,6 @@ $i = 0
 Get-Content $test | ForEach-Object {
 	$page = $_
 	foreach ($browser in $browsers) {
-		$browser = $browsers[$i]
 		switch ($browser)
 		{
 			"Brave" {

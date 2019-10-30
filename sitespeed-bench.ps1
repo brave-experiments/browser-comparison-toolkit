@@ -5,9 +5,10 @@ param (
 
 $browsers = @("Chrome", "Brave", "Firefox", "Opera")
 
+$i = 0
 Get-Content $test | ForEach-Object {
 	$page = $_
-	for ($i=0; $i -lt $browsers.Length; $i++){
+	foreach ($browser in $browsers) {
 		$browser = $browsers[$i]
 		switch ($browser)
 		{
@@ -47,5 +48,6 @@ Get-Content $test | ForEach-Object {
 			--connectivity.alias $connectivity `
 			$page
 	}
+	$i += 1
 }
 

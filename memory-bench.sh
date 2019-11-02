@@ -8,7 +8,7 @@ REPEATS=3
 case $BROWSER in
 	Brave )
 		PROCESS_NAMES="Brave Browser"
-		EXECUTABLE="/Applications/Brave Browser Nightly 2.app"
+		EXECUTABLE="/Applications/Brave Browser Beta.app"
 		APPLICATION="Brave Browser"
 		;;
 	Firefox )

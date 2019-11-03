@@ -61,14 +61,16 @@ We used Browsertime to load every page in our test set 3 times, restarting the b
 To use the script with all the pages in our test scenarios on MacOS:
 
 ```bash
-./sitespeed-bench.sh Brave ./scenarios/fullset.txt
+./sitespeed-bench.sh ./scenarios/fullset.txt 4g
 ```
 
 And on Windows:
 
 ```PowerShell
-.\sitespeed-bench.ps1 Brave .\scenarios\fullset.txt
+.\sitespeed-bench.ps1 .\scenarios\fullset.txt 4g
 ```
+
+Network connectivity here is specified only to be included in the generated output, but does not in fact change any network settings. In our tests we throttle network connectivity using MacOS "Network Link Conditioner" and relied on the WiFi access point functionality to limit network speed for Windows due to lack of a built-in tool.
 
 Finally the `collect.sh` script iterates through all Browsertime's trace files, extracting the metrics of interest and producing a single CSV file ready to be imported in a data processing tool, e.g.:
 

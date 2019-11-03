@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# BROWSER=$1
 TEST=$1
+CONNECTIVITY=$2
 
 IFS=$'\n' read -d '' -r -a PAGES < $TEST
 
@@ -41,11 +41,11 @@ do
 		browsertime -b $SPBROWSER "${LAUNCH[@]}" "${FLAGS[@]}" \
 			-n 3 \
 			--pageCompleteCheckInactivity \
-			--resultDir browsertime/$BROWSER/4g/$i \
+			--resultDir browsertime/$BROWSER/$CONNECTIVITY/$i \
 			--viewPort maximize \
-			--connectivity.alias unthrottled \
+			--connectivity.alias $CONNECTIVITY \
+			--preURL about:blank --preURLDelay 10000 \
 			$url
-						# --preURL $url \
 	done
 done
 

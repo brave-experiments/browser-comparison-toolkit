@@ -7,7 +7,7 @@ Write-Output "Measuring $browser for scenario $test"
 
 $repeats = 3
 $wait = 30
-$braveapplication = '\BraveSoftware\Brave-Browser-Beta\Application\'
+$braveapplication = '\BraveSoftware\Brave-Browser\Application\'
 
 Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
     $fullname = $_.FullName

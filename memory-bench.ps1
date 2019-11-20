@@ -14,13 +14,13 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
     $test = $_.Name
     
     for ($i=1; $i -le $repeats; $i++) {
-        Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA$braveapplication
+        Start-Process -FilePath $browser
         Start-Sleep -Seconds 5
     
         Get-Content $fullname | ForEach-Object {
             $page = $_
             Write-Output "Opening page $page"
-            Start-Process -FilePath $browser -WorkingDirectory $ENV:LOCALAPPDATA$braveapplication -ArgumentList $page
+            Start-Process -FilePath $browser -ArgumentList $page
             Start-Sleep -Seconds 5
         }
     

@@ -39,7 +39,7 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
         $process = Get-Process -Name $browser
         while ($process -ne $null) {
             echo "Browser Process Running, attempting to close main window: $process"
-            $process | ForEach-Object { $_.CloseMainWindow() | Out-Null } | Stop-Process -Force
+            $process | Stop-Process -Force
             Start-Sleep 5
             $process = Get-Process -Name $browser -ErrorAction SilentlyContinue
         }

@@ -8,19 +8,20 @@ Write-Output "Measuring $browser for scenario $test"
 $repeats = 3
 $wait = 30
 $braveapplication = '\BraveSoftware\Brave-Browser\Application\'
+$userdatadir = '.\mem-test\'
 
 Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
     $fullname = $_.FullName
     $test = $_.Name
     
     for ($i=1; $i -le $repeats; $i++) {
-        Start-Process -FilePath $browser --no-first-run --incognito
+        Start-Process -FilePath $browser -ArgumentList --user-data-dir=$userdatadir, --no-first-run
         Start-Sleep -Seconds 5
     
         Get-Content $fullname | ForEach-Object {
             $page = $_
             Write-Output "Opening page $page"
-            Start-Process -FilePath $browser -ArgumentList --no-first-run --incognito $page
+            Start-Process -FilePath $browser -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
             Start-Sleep -Seconds 5
         }
     
@@ -42,5 +43,7 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
             Start-Sleep 5
             $process = Get-Process -Name $browser -ErrorAction SilentlyContinue
         }
+        rm $userdatadir
+
     }
 }

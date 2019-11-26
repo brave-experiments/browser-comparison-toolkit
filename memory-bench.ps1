@@ -14,13 +14,13 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
     $test = $_.Name
     
     for ($i=1; $i -le $repeats; $i++) {
-        Start-Process -FilePath $browser
+        Start-Process -FilePath $browser --no-first-run --incognito
         Start-Sleep -Seconds 5
     
         Get-Content $fullname | ForEach-Object {
             $page = $_
             Write-Output "Opening page $page"
-            Start-Process -FilePath $browser -ArgumentList $page
+            Start-Process -FilePath $browser -ArgumentList --no-first-run --incognito $page
             Start-Sleep -Seconds 5
         }
     
@@ -37,6 +37,7 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
 
         $process = Get-Process -Name $browser
         while ($process -ne $null) {
+            echo "Browser Process Running, attempting to close main window: $process"
             $process | ForEach-Object { $_.CloseMainWindow() | Out-Null } | Stop-Process -Force
             Start-Sleep 5
             $process = Get-Process -Name $browser -ErrorAction SilentlyContinue

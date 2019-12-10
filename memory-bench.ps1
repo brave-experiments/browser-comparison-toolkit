@@ -13,7 +13,7 @@ if ($localinstall) {
     $workingdir = "-WorkingDirectory $localinstall"
 }
 
-$userdatadir = '.\mem-test\'
+$userdatadir = "$pwd\mem-test\"
 
 Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
     $fullname = $_.FullName
@@ -36,19 +36,19 @@ Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
         # $m = ps $browser | measure PM -Sum
 
         $m = Get-WmiObject -class Win32_PerfFormattedData_PerfProc_Process -filter "Name LIKE '$($browser)%'" |
-            Select -expand workingSetPrivate |
+            Select-Object -expand workingSetPrivate |
             Measure-Object -sum
         
         ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
 
         $process = Get-Process -Name $browser
         while ($process -ne $null) {
-            echo "Browser Process Running, attempting to close main window: $process"
+            Write-Output "Browser Process Running, attempting to close main window: $process"
             $process | Stop-Process -Force
             Start-Sleep 5
             $process = Get-Process -Name $browser -ErrorAction SilentlyContinue
         }
-        rm $userdatadir
+        Remove-Item -Recurse -Force $userdatadir
 
     }
 }

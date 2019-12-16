@@ -10,7 +10,7 @@ $wait = 30
 $braveapplication = '\BraveSoftware\Brave-Browser\Application\'
 $localinstall = Test-Path -Path $ENV:LOCALAPPDATA$braveapplication
 if ($localinstall) {
-    $workingdir = "$braveapplication"
+    $workingdir = $ENV:LOCALAPPDATA$braveapplication
 }
 
 $userdatadir = "$pwd\mem-test\"

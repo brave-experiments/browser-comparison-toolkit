@@ -10,23 +10,26 @@ $wait = 30
 $braveapplication = '\BraveSoftware\Brave-Browser\Application\'
 $localinstall = Test-Path -Path $ENV:LOCALAPPDATA$braveapplication
 if ($localinstall) {
-    $workingdir = "-WorkingDirectory $braveapplication"
+    $workingdir = "$braveapplication"
 }
 
 $userdatadir = "$pwd\mem-test\"
+$scenariosdir = "$pwd\scenarios\"
 
-Get-ChildItem ".\scenarios\" -Filter $test*.txt | Foreach-Object {
+Write-Output "Running scenarios $test*.txt from $scenariosdir"
+
+Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
     $fullname = $_.FullName
     $test = $_.Name
     
     for ($i=1; $i -le $repeats; $i++) {
-        Start-Process -FilePath $browser $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run
+        Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run
         Start-Sleep -Seconds 5
     
         Get-Content $fullname | ForEach-Object {
             $page = $_
             Write-Output "Opening page $page"
-            Start-Process -FilePath $browser $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
+            Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
             Start-Sleep -Seconds 5
         }
     

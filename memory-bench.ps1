@@ -66,6 +66,6 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
 }
 
 $result | ConvertTo-Json -Depth 4 -Compress | 
-    Out-File -FilePath $pwd "memory-results.json"
+    Out-File -FilePath "$pwd\memory-results.json"
 
 Get-Content -Path "$pwd\memory-results.json"

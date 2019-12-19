@@ -24,23 +24,16 @@ pipeline {
                 benchmark altInputSchema: '''{
                     "type": "object",
                     "properties": {
-                        "scenarios": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "test": { "type": "name" },
-                                    "runs": { 
-                                        "type": "array",
-                                        "items": {
-                                            "type": "value"
-                                        }
-                                    }
-                                }
+                        "memory": {
+                            "type": "object",
+                            "properties": {
+                                "test": { "type": "name" },
+                                "average": { "type": "result" }
                             }
                         }
                     }
-                }''', altInputSchemaLocation: '', inputLocation: '*.json', schemaSelection: 'customSchema', truncateStrings: true
+                }
+                ''', altInputSchemaLocation: '', inputLocation: '*.json', schemaSelection: 'customSchema', truncateStrings: true
             }
         }
     }

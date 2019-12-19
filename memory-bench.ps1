@@ -49,7 +49,7 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
         # ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
 
         # $testresult.memory += $m.sum
-        $testresult.memory += 3000
+        # $testresult.memory += 3000
 
         # $process = Get-Process -Name $browser
         # while ($process -ne $null) {
@@ -65,4 +65,7 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
     $result.scenarios += $testresult
 }
 
-$result | ConvertTo-Json -Depth 4 | Out-File -FilePath memory-results.json
+$resultobj = $result | ConvertTo-Json -Depth 4
+$resultobj | Out-File memory-results.json
+
+Write-Output $resultobj

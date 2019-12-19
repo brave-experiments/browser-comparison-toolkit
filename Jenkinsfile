@@ -34,7 +34,7 @@ pipeline {
                             }
                         }
                     }
-                }''', altInputSchemaLocation: '', inputLocation: 'time*.json', schemaSelection: 'customSchema', truncateStrings: true
+                }''', altInputSchemaLocation: '', inputLocation: '*.json', schemaSelection: 'customSchema', truncateStrings: true
             }
         }
     }

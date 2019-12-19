@@ -24,7 +24,7 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
     $fullname = $_.FullName
     $test = $_.Name
 
-    $testresult = @{test = $test; memory = @()}
+    $testresult = @{test = $test; runs = @()}
     
     for ($i=1; $i -le $repeats; $i++) {
         # Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run
@@ -48,8 +48,8 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
         
         # ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
 
-        # $testresult.memory += $m.sum
-        $testresult.memory += 3000
+        # $testresult.runs += $m.sum
+        $testresult.runs += 3000
 
         # $process = Get-Process -Name $browser
         # while ($process -ne $null) {

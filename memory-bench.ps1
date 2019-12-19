@@ -27,38 +27,38 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
     $testresult = @{test = $test; runs = @()}
     
     for ($i=1; $i -le $repeats; $i++) {
-        # Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run
-        # Start-Sleep -Seconds 5
+        Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run
+        Start-Sleep -Seconds 5
     
-        # Get-Content $fullname | ForEach-Object {
-        #     $page = $_
-        #     Write-Output "Opening page $page"
-        #     Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
-        #     Start-Sleep -Seconds 5
-        # }
+        Get-Content $fullname | ForEach-Object {
+            $page = $_
+            Write-Output "Opening page $page"
+            Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
+            Start-Sleep -Seconds 5
+        }
     
 
-        # Start-Sleep -Seconds $wait
+        Start-Sleep -Seconds $wait
 
-        # # $m = ps $browser | measure PM -Sum
+        # $m = ps $browser | measure PM -Sum
 
-        # $m = Get-WmiObject -class Win32_PerfFormattedData_PerfProc_Process -filter "Name LIKE '$($browser)%'" |
-        #     Select-Object -expand workingSetPrivate |
-        #     Measure-Object -sum
+        $m = Get-WmiObject -class Win32_PerfFormattedData_PerfProc_Process -filter "Name LIKE '$($browser)%'" |
+            Select-Object -expand workingSetPrivate |
+            Measure-Object -sum
         
-        # ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
+        ("$browser $test $i {0:N2}MB " -f ($m.sum / 1mb))
 
-        # $testresult.runs += $m.sum
-        $testresult.runs += 3000
+        $testresult.runs += $m.sum
+        # $testresult.runs += 3000
 
-        # $process = Get-Process -Name $browser
-        # while ($process -ne $null) {
-        #     Write-Output "Browser Process Running, attempting to close main window: $process"
-        #     $process | Stop-Process -Force
-        #     Start-Sleep 5
-        #     $process = Get-Process -Name $browser -ErrorAction SilentlyContinue
-        # }
-        # Remove-Item -Recurse -Force $userdatadir
+        $process = Get-Process -Name $browser
+        while ($process -ne $null) {
+            Write-Output "Browser Process Running, attempting to close main window: $process"
+            $process | Stop-Process -Force
+            Start-Sleep 5
+            $process = Get-Process -Name $browser -ErrorAction SilentlyContinue
+        }
+        Remove-Item -Recurse -Force $userdatadir
 
     }
 

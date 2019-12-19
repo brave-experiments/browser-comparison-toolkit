@@ -40,7 +40,7 @@ pipeline {
                             }
                         }
                     }
-                }''', altInputSchemaLocation: '', inputLocation: 'memory*.json', schemaSelection: 'customSchema', truncateStrings: true
+                }''', altInputSchemaLocation: '', inputLocation: 'time*.json', schemaSelection: 'customSchema', truncateStrings: true
             }
         }
     }

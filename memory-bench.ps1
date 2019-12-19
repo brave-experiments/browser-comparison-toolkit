@@ -62,6 +62,10 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
 
     }
 
+    $testresult.average = ($testresult.runs | Measure-Object -Average).Average
+    @{memory = $testresult} | ConvertTo-Json -Depth 4 -Compress | 
+        Out-File -FilePath memory-$test.json -Encoding UTF8
+
     $result.scenarios += $testresult
 }
 

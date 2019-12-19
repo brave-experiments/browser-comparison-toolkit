@@ -65,7 +65,7 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
     $result.scenarios += $testresult
 }
 
-$resultobj = $result | ConvertTo-Json -Depth 4
+$resultobj = $result | ConvertTo-Json -Depth 4 -Compress
 $resultobj | Out-File memory-results.json
 
 Write-Output $resultobj

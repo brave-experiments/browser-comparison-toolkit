@@ -69,6 +69,3 @@ $result | ConvertTo-Json -Depth 4 -Compress |
     Out-File -FilePath "$pwd\memory-results.json"
 
 Get-Content -Path "$pwd\memory-results.json"
-
-Write-Output '{"time":{"response":11,"render":1925,"load":1942,"firstMeaningfulPaint":828.4829999902286}}' | 
-    Out-File -FilePath "$pwd\time-results.json"

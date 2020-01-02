@@ -29,13 +29,13 @@ Get-ChildItem $scenariosdir -Filter $test*.txt | Foreach-Object {
     $testresult = @{test = $test; runs = @()}
     
     for ($i=1; $i -le $repeats; $i++) {
-        Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run
+        Start-Process -FilePath $browser -ArgumentList --user-data-dir=$userdatadir, --no-first-run
         Start-Sleep -Seconds 5
     
         Get-Content $fullname | ForEach-Object {
             $page = $_
             Write-Output "Opening page $page"
-            Start-Process -FilePath $browser -WorkingDirectory $workingdir -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
+            Start-Process -FilePath $browser -ArgumentList --user-data-dir=$userdatadir, --no-first-run, $page
             Start-Sleep -Seconds 5
         }
     

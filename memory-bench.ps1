@@ -11,6 +11,8 @@ $braveapplication = '\BraveSoftware\Brave-Browser\Application\'
 $localinstall = Test-Path -Path $ENV:LOCALAPPDATA$braveapplication
 if ($localinstall) {
     $workingdir = "$ENV:LOCALAPPDATA$braveapplication"
+} else {
+    $workingdir = Get-Location
 }
 
 $userdatadir = "$pwd\mem-test\"

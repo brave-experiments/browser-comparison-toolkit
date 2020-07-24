@@ -8,7 +8,7 @@ REPEATS=3
 case $BROWSER in
 	Brave )
 		PROCESS_NAMES="Brave Browser"
-		EXECUTABLE="/Applications/Brave Browser Beta.app"
+		EXECUTABLE="/Applications/Brave Browser Nightly.app"
 		APPLICATION="Brave Browser"
 		;;
 	Firefox )
@@ -23,14 +23,14 @@ case $BROWSER in
 		;;
 	Chrome )
 		PROCESS_NAMES="Google Chrome"
-		EXECUTABLE="/Applications/Google Chrome 3.app"
-		APPLICATION="Google Chrome 3"
+		EXECUTABLE="/Applications/Google Chrome.app"
+		APPLICATION="Google Chrome"
 		;;
 	ChromeUBO )
 		PROCESS_NAMES="Google Chrome"
-		EXECUTABLE="/Applications/Google Chrome 3.app"
+		EXECUTABLE="/Applications/Google Chrome.app"
 		FLAGS="--load-extension=$(pwd)/uBO"
-		APPLICATION="Google Chrome 3"
+		APPLICATION="Google Chrome"
 		;;
 	Opera )
 		PROCESS_NAMES="Opera"
@@ -46,7 +46,7 @@ esac
 
 for TEST in ./scenarios/$TESTSET*.txt
 do
-  	echo "$BROWSER Processing $TEST file..."
+	echo "$BROWSER Processing $TEST file..."
 
 	IFS=$'\n' read -d '' -r -a PAGES < ${TEST}
 
@@ -58,8 +58,8 @@ do
 		for url in "${PAGES[@]}"
 		do
 			command="tell application \"$APPLICATION\" to open location \"$url\""
-		    osascript -e "$command"
-		    sleep 5;	# Sleep for 5 seconds after each page opened
+			osascript -e "$command"
+			sleep 5;	# Sleep for 5 seconds after each page opened
 		done
 
 	# 	read -r -d '' cycle_tabs << EOM
@@ -81,10 +81,10 @@ do
 		top -l 1 -stats mem,command \
 			| egrep "$PROCESS_NAMES" \
 			| awk -v run=$i -v browser=$BROWSER '{
-		    ex = index("KMGTPEZY", substr($1, length($1)-1, 1))
-		    val = substr($1, 0, length($1) - 2)
-		    prod = val * 1024^ex
-		    sum += prod
+			ex = index("KMGTPEZY", substr($1, length($1), 1));
+			val = substr($1, 0, length($1) - 1)
+			prod = val * 1024^ex
+			sum += prod
 		}
 		END {print browser " run " run ": total memory " sum / 1024 / 1024 " MB"}';
 		

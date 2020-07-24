@@ -14,9 +14,9 @@ pipeline {
                         Stop-Process -Name "Brave*" -Force
                         Write-Host "wget https://brave-browser-downloads.s3.brave.com/latest/BraveBrowserSetup.exe"
                         wget "https://brave-browser-downloads.s3.brave.com/latest/BraveBrowserSetup.exe" -OutFile "BraveBrowserSetup.exe"
-                        Start-Sleep -Second 10
+                        Start-Sleep -Second 30
                         Start-Process "BraveBrowserSetup.exe"
-                        Start-Sleep -Second 10
+                        Start-Sleep -Second 60
                         ./memory-bench.ps1 Brave five
                         Stop-Process -Name "Brave*" -Force
                     """

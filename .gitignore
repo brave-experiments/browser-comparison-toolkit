@@ -2,3 +2,5 @@
 *.tar.gz
 *.csv
 results/
+browser_profiles/
+browsertime/

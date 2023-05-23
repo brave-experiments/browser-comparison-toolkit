@@ -30,9 +30,17 @@ def _get_private_memory_usage_mac(pid: int) -> float:
   logging.debug('%d %f %s %d %f', pid, val, scale, ex, mem)
   return mem
 
+def _get_private_memory_usage_win(pid: int) -> float:
+  output = subprocess.check_output(['powershell.exe', '-Command', f'WmiObject -class Win32_PerfFormattedData_PerfProc_Process -filter "IDProcess like {pid}" | Select-Object -expand workingSetPrivate'], text=True)
+  pmf = float(output.rstrip())
+  assert(pmf > 0)
+  return pmf
+
 def _get_private_memory_usage(pid: int) -> float:
   if platform.system() == 'Darwin':
     return _get_private_memory_usage_mac(pid)
+  if platform.system() == 'Windows':
+    return _get_private_memory_usage_win(pid)
   raise RuntimeError('Platform is not supported')
 
 
@@ -59,16 +67,18 @@ class MemoryMeasurement:
 
 
   def Run(self, urls: List[str], browser: Browser, unsafe: bool) -> Dict[str, float]:
-    browser.prepare_profile(unsafe)
-    browser.start()
-    time.sleep(self.start_delay)
-    for url in urls:
-      browser.open_url(url)
-      time.sleep(self.open_url_delay)
-    time.sleep(self.measure_delay)
+    try:
+      browser.prepare_profile(unsafe)
+      browser.start()
+      time.sleep(self.start_delay)
+      for url in urls:
+        browser.open_url(url)
+        time.sleep(self.open_url_delay)
+      time.sleep(self.measure_delay)
 
-    private_memory = _get_browser_private_memory_usage(browser)
-    assert private_memory > 0
-    browser.terminate()
+      private_memory = _get_browser_private_memory_usage(browser)
+      assert private_memory > 0
+    finally:
+      browser.terminate()
     time.sleep(self.terminate_delay)
     return {'TotalPrivateMemory': private_memory}

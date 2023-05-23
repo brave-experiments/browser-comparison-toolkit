@@ -1,8 +1,12 @@
 import argparse
+import logging
 
 from components.browser import Browser, get_browsers_classes_by_name
 
 def make_profile():
+  log_format = '%(asctime)s: %(message)s'
+  logging.basicConfig(level=logging.DEBUG, format=log_format)
+
   parser = argparse.ArgumentParser()
   parser.add_argument('browser', type=str)
   args = parser.parse_args()

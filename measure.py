@@ -50,7 +50,7 @@ def main():
     result_writer = csv.writer(result_file, delimiter=',',
                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-    result_writer.writerow(['Test name', 'Browser', 'Metric_name'] + ['value'] * args.repeat + ['avg', 'stdev'])
+    result_writer.writerow(['Test name', 'Browser', 'Metric_name'] + ['value'] * args.repeat + ['avg', 'stdev', 'stdev%'])
     browser_classes = get_browsers_classes_by_name(args.browser)
     for browser_class in browser_classes:
       results: Dict[str, List[float]] = {}
@@ -59,21 +59,25 @@ def main():
         browser_name = browser_class.name()
         metrics = measure.Run(iteration, browser_class)
         for metric, key, value in metrics:
-          if results.get(metric) is None:
-            results[metric + key] = [value]
+          metric_name = metric + '_' + key
+          if results.get(metric_name) is None:
+            results[metric_name] = [value]
           else:
-            results[metric + key].append(value)
+            results[metric_name].append(value)
 
           if key is not None:
-            total_metric_name = f'{metric}_Total_{browser_name}'
+            total_metric_name = f'{metric}_Total'
             if results.get(total_metric_name) is None:
-              results[total_metric_name] = [value]
-            else:
-              results[total_metric_name].append(value)
+              results[total_metric_name] = []
+            if len(results[total_metric_name]) <= iteration:
+              results[total_metric_name].append(0)
+            results[total_metric_name][-1] += value
 
         logging.info([test_name, browser_name, metrics])
       for metric, values in results.items():
         avg = statistics.fmean(values)
         stdev = statistics.stdev(values) if len(values) > 1 else 0
-        result_writer.writerow([test_name, browser_name, metric] + values + [avg, stdev])
+        rstdev = stdev / avg if avg > 0 else 0
+        result_writer.writerow(
+          [test_name, browser_name, metric] + values + [avg, stdev, rstdev])
 main()

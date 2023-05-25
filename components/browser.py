@@ -8,11 +8,7 @@ import psutil
 import logging
 import platform
 
-def is_mac():
-  return platform.system() == 'Darwin'
-
-def is_win():
-  return platform.system() == 'Windows'
+from components.utils import is_mac, is_win
 
 class Browser:
   binary_name: str

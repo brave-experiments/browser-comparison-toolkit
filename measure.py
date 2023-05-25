@@ -3,11 +3,11 @@ import logging
 import csv
 import statistics
 from typing import Dict, List
-from components.benchmark_measurement import BenchmarkMeasurement
 
 from components.browser import get_browsers_classes_by_name
-from components.browsertime_measurement import BrowsertimeMeasurement
 from components.measurement import MeasurementState
+from components.benchmark_measurement import BenchmarkMeasurement
+from components.browsertime_measurement import BrowsertimeMeasurement
 from components.memory_measurement import MemoryMeasurement
 
 def get_measure_by_args(args):

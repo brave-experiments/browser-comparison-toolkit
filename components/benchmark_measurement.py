@@ -38,7 +38,7 @@ class BenchmarkMeasurement(Measurement):
               '--viewPort', 'maximize',
               '--preURL', 'about:blank',
               # '--chrome.noDefaultOptions', #TODO
-              '--timeouts.script', str(10 * 60 * 1000),
+              '--timeouts.script', str(30 * 60 * 1000),
               '--preURLDelay', str(preURLDelay),
               f'--{browser.browsertime_binary}.binaryPath', browser.binary()]
       for arg in browser.get_args():
@@ -49,8 +49,9 @@ class BenchmarkMeasurement(Measurement):
       subprocess.check_call(args)
       with open(os.path.join(result_dir, 'browsertime.json'), 'r') as output:
         data = json.load(output)
-        score = data[0]['extras'][0]['score']
-        results.append(('score', None, score))
+        js_metrics = data[0]['extras'][0]
+        for metric, value in js_metrics.items():
+          results.append((metric, None, value))
       # with open(os.path.join(result_dir, 'browsertime.har'), 'r') as har:
       #   total_bytes = 0
       #   data = json.load(har)

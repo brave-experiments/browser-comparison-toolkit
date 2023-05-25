@@ -1,5 +1,5 @@
 async function perfTest(context, commands) {
-  await commands.measure.start('https://browserbench.org/Speedometer2.0/?iterationCount=1');
+  await commands.measure.start('https://browserbench.org/Speedometer2.0/?iterationCount=10');
   await commands.js.run('startTest()');
 
   while (true) {
@@ -7,7 +7,7 @@ async function perfTest(context, commands) {
     value = await commands.js.run("return window.document.getElementById('result-number').innerHTML")
     if (value && value != '' ) {
       console.log('got result', value)
-      commands.measure.addObject({ 'score': parseFloat(value)});
+      commands.measure.addObject({ 'speedometer2_score': parseFloat(value)});
       break;
     }
   }

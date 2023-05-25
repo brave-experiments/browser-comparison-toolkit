@@ -44,6 +44,10 @@ class BenchmarkMeasurement(Measurement):
       for arg in browser.get_args():
         assert arg.startswith('--')
         args.extend(['--chrome.args', arg[2:]])
+      # TODO: support noDefaultOptions
+      # args.extend(['--chrome.args', 'remote-debugging-port=9222'])
+      # args.extend(['--chrome.args', 'test-type=webdriver'])
+
       args.append(script)
       logging.debug(args)
       subprocess.check_call(args)

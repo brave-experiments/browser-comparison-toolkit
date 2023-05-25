@@ -7,8 +7,8 @@ import time
 import psutil
 
 from components.browser import Browser
-from components.measurement import Measurement
-from typing import Dict, List, Optional, Tuple
+from components.measurement import Measurement, MeasurementState
+from typing import Dict, List, Optional, Tuple, Type
 
 def _get_private_memory_usage_mac(pid: int) -> float:
   output = subprocess.run(
@@ -52,26 +52,28 @@ def _get_browser_private_memory_usage(browser: Browser) -> float:
       total +=_get_private_memory_usage(p.pid)
   return total
 
-class MemoryMeasurement:
+class MemoryMeasurement(Measurement):
   start_delay = 5
   open_url_delay = 5
   measure_delay = 60
   terminate_delay = 10
 
-  def __init__(self, short_delay_for_testing = False) -> None:
-    if short_delay_for_testing:
+  def __init__(self, state: MeasurementState) -> None:
+    super().__init__(state)
+    if state.low_delays_for_testing:
       self.start_delay = 1
       self.open_url_delay = 1
       self.measure_delay = 5
       self.terminate_delay = 5
 
 
-  def Run(self, urls: List[str], browser: Browser, unsafe: bool) -> Dict[str, float]:
+  def Run(self, iteration: int, browser_class: Type[Browser]) -> List[Tuple[str, str, float]]:
+    browser = browser_class()
     try:
-      browser.prepare_profile(unsafe)
+      browser.prepare_profile(self.state.unsafe_use_profiles)
       browser.start()
       time.sleep(self.start_delay)
-      for url in urls:
+      for url in self.state.urls:
         browser.open_url(url)
         time.sleep(self.open_url_delay)
       time.sleep(self.measure_delay)
@@ -81,4 +83,4 @@ class MemoryMeasurement:
     finally:
       browser.terminate()
     time.sleep(self.terminate_delay)
-    return {'TotalPrivateMemory': private_memory}
+    return [('TotalPrivateMemory', '', private_memory)]

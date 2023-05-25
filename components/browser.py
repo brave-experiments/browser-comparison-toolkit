@@ -17,10 +17,10 @@ def is_win():
 class Browser:
   binary_name: str
   use_user_data_dir: bool = True
-  temp_user_data_dir: Optional[TemporaryDirectory] = None
-
+  browsertime_binary: str
   args: List[str] = []
 
+  temp_user_data_dir: Optional[TemporaryDirectory] = None
   process: Optional[subprocess.Popen] = None
 
   @classmethod
@@ -43,8 +43,11 @@ class Browser:
   def binary_win(self) -> str:
     raise RuntimeError('Not implemented')
 
-  def _get_start_cmd(self, use_source_profile = False) -> List[str]:
-    args = [self.binary()]
+  def get_start_cmd(self, use_source_profile = False) -> List[str]:
+    return [self.binary()] + self.get_args()
+
+  def get_args(self, use_source_profile = False) -> List[str]:
+    args = []
     if self.use_user_data_dir:
       if use_source_profile:
         args.append(f'--user-data-dir={self._get_source_profile()}')
@@ -91,8 +94,8 @@ class Browser:
 
   def start(self, use_source_profile=False):
     assert self.process is None
-    logging.debug(self._get_start_cmd(use_source_profile))
-    self.process = subprocess.Popen(self._get_start_cmd(use_source_profile), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    logging.debug(self.get_start_cmd(use_source_profile))
+    self.process = subprocess.Popen(self.get_start_cmd(use_source_profile), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
   def terminate(self):
     assert self.process is not None
@@ -102,16 +105,19 @@ class Browser:
 
   def open_url(self, url: str):
     assert self.process is not None
-    rv = subprocess.call(self._get_start_cmd() + [url], stdout=subprocess.PIPE)
+    rv = subprocess.call(self.get_start_cmd() + [url], stdout=subprocess.PIPE)
     if self.name() != 'Opera':
       assert rv == 0
 
-class Brave(Browser):
+class _Chromium(Browser):
+  browsertime_binary = 'chrome'
+
+class Brave(_Chromium):
   binary_name = 'Brave Browser'
   def binary_win(self) -> str:
     return os.path.expandvars(Rf'%ProgramFiles%\BraveSoftware\Brave-Browser\Application\brave.exe')
 
-class Chrome(Browser):
+class Chrome(_Chromium):
   binary_name = 'Google Chrome'
   def binary_win(self) -> str:
     return os.path.expandvars(Rf'%ProgramFiles%\Google\Chrome\Application\chrome.exe')
@@ -119,7 +125,7 @@ class Chrome(Browser):
 class ChromeUBO(Chrome):
   pass
 
-class Opera(Browser):
+class Opera(_Chromium):
   binary_name = 'Opera'
   args = ['--ran-launcher']
   def binary_win(self) -> str:
@@ -127,6 +133,7 @@ class Opera(Browser):
 
 class Edge(Browser):
   binary_name = 'Microsoft Edge'
+  browsertime_binary = 'edge'
 
   def binary_win(self) -> str:
     return os.path.expandvars(R'%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe')
@@ -134,6 +141,7 @@ class Edge(Browser):
 class Safari(Browser):
   binary_name = 'Safari'
   use_user_data_dir = False
+  browsertime_binary = 'safari'
 
   def profile_dir(self) -> str:
     if is_mac():
@@ -143,8 +151,8 @@ class Safari(Browser):
 
 class Firefox(Browser):
   binary_name = 'Firefox'
-  vendor = 'Mozilla'
   use_user_data_dir = False
+  browsertime_binary = 'firefox'
 
   def profile_dir(self) -> str:
     if is_mac():

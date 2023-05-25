@@ -1,6 +1,16 @@
 from components.browser import Browser
-from typing import List, Tuple
+from typing import List, Dict, Tuple, Type
+
+class MeasurementState:
+  urls: List[str]
+  unsafe_use_profiles = False
+  low_delays_for_testing = False
 
 class Measurement:
-  def Run(self, browser: Browser) -> List[Tuple[str, float]]:
+  state: MeasurementState
+
+  def __init__(self, state: MeasurementState):
+    self.state = state
+
+  def Run(self, iteration: int, browser_class: Type[Browser]) -> List[Tuple[str, str, float]]:
     raise RuntimeError('Not implemented')

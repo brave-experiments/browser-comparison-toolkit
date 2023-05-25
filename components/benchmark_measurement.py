@@ -16,16 +16,18 @@ from components.browser import Browser
 from components.measurement import Measurement
 from components.utils import is_win
 
-class BrowsertimeMeasurement(Measurement):
+class BenchmarkMeasurement(Measurement):
   def Run(self, iteration: int, browser_class: Type[Browser]) -> List[Tuple[str, Optional[str], float]]:
     urls = self.state.urls
     results: List[Tuple[str, Optional[str], float]] = []
 
     for i in range(len(urls)):
       browser = browser_class()
+      name = urls[i]
+      script = os.path.join('benchmark_scripts', name)
+      assert os.path.exists(script)
       browser.prepare_profile(self.state.unsafe_use_profiles)
-      domain = urlparse(urls[i]).netloc
-      result_dir = f'browsertime/{browser.name()}/{i}_{domain}/{iteration}/'
+      result_dir = f'browsertime/{browser.name()}/{i}_{name}/{iteration}/'
       preURLDelay = 1000 if self.state.low_delays_for_testing else 10000
       npm_binary = 'npm.cmd' if is_win() else 'npm'
       args = [npm_binary, 'exec', 'browsertime', '--',
@@ -36,25 +38,24 @@ class BrowsertimeMeasurement(Measurement):
               '--viewPort', 'maximize',
               '--preURL', 'about:blank',
               # '--chrome.noDefaultOptions', #TODO
+              '--timeouts.script', str(10 * 60 * 1000),
               '--preURLDelay', str(preURLDelay),
               f'--{browser.browsertime_binary}.binaryPath', browser.binary()]
       for arg in browser.get_args():
         assert arg.startswith('--')
         args.extend(['--chrome.args', arg[2:]])
-      args.append(urls[i])
+      args.append(script)
       logging.debug(args)
       subprocess.check_call(args)
       with open(os.path.join(result_dir, 'browsertime.json'), 'r') as output:
         data = json.load(output)
-        timings = data[0]['statistics']['timings']
-        results.append(('fullyLoaded', domain, timings['fullyLoaded']['mean']))
-        results.append(('largestContentfulPaint', domain, timings['largestContentfulPaint']['loadTime']['mean']))
-        results.append(('loadEventEnd', domain, timings['loadEventEnd']['mean']))
-      with open(os.path.join(result_dir, 'browsertime.har'), 'r') as har:
-        total_bytes = 0
-        data = json.load(har)
-        for e in data['log']['entries']:
-          total_bytes += e['response']['_transferSize']
-        results.append(('totalBytes', domain, total_bytes))
+        score = data[0]['extras'][0]['score']
+        results.append(('score', None, score))
+      # with open(os.path.join(result_dir, 'browsertime.har'), 'r') as har:
+      #   total_bytes = 0
+      #   data = json.load(har)
+      #   for e in data['log']['entries']:
+      #     total_bytes += e['response']['_transferSize']
+      #   results.append(('totalBytes', domain, total_bytes))
 
     return results

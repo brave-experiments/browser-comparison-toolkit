@@ -67,7 +67,7 @@ class MemoryMeasurement(Measurement):
       self.terminate_delay = 5
 
 
-  def Run(self, iteration: int, browser_class: Type[Browser]) -> List[Tuple[str, str, float]]:
+  def Run(self, iteration: int, browser_class: Type[Browser]) -> List[Tuple[str, Optional[str], float]]:
     browser = browser_class()
     try:
       browser.prepare_profile(self.state.unsafe_use_profiles)
@@ -83,4 +83,4 @@ class MemoryMeasurement(Measurement):
     finally:
       browser.terminate()
     time.sleep(self.terminate_delay)
-    return [('TotalPrivateMemory', '', private_memory)]
+    return [('TotalPrivateMemory', None, private_memory)]

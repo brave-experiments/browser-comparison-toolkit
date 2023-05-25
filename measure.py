@@ -3,6 +3,7 @@ import logging
 import csv
 import statistics
 from typing import Dict, List
+from components.benchmark_measurement import BenchmarkMeasurement
 
 from components.browser import get_browsers_classes_by_name
 from components.browsertime_measurement import BrowsertimeMeasurement
@@ -19,6 +20,8 @@ def get_measure_by_args(args):
     return MemoryMeasurement(state)
   if args.measure == 'browsertime':
     return BrowsertimeMeasurement(state)
+  if args.measure == 'benchmarks':
+    return BenchmarkMeasurement(state)
   raise RuntimeError(f'No measurement {args.measure} found')
 
 
@@ -59,7 +62,7 @@ def main():
         browser_name = browser_class.name()
         metrics = measure.Run(iteration, browser_class)
         for metric, key, value in metrics:
-          metric_name = metric + '_' + key
+          metric_name = metric + '_' + key if key is not None else metric
           if results.get(metric_name) is None:
             results[metric_name] = [value]
           else:

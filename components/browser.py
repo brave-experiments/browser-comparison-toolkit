@@ -1,14 +1,21 @@
+# Copyright (c) 2023 The Brave Authors. All rights reserved.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at https://mozilla.org/MPL/2.0/.
+
 import os
 import shutil
 import subprocess
-from tempfile import TemporaryDirectory
 import time
-from typing import Dict, List, Optional, Tuple
-import psutil
 import logging
 import platform
+import psutil
+
+from tempfile import TemporaryDirectory
+from typing import List, Optional
 
 from components.utils import is_mac, is_win
+
 
 class Browser:
   binary_name: str
@@ -34,15 +41,16 @@ class Browser:
     raise RuntimeError('Unsupported platform')
 
   def binary_mac(self) -> str:
-    return f'/Applications/{self.binary_name}.app/Contents/MacOS/{self.binary_name}'
+    return (f'/Applications/{self.binary_name}.app/Contents/MacOS/' +
+            self.binary_name)
 
   def binary_win(self) -> str:
     raise RuntimeError('Not implemented')
 
-  def get_start_cmd(self, use_source_profile = False) -> List[str]:
-    return [self.binary()] + self.get_args()
+  def get_start_cmd(self, use_source_profile=False) -> List[str]:
+    return [self.binary()] + self.get_args(use_source_profile)
 
-  def get_args(self, use_source_profile = False) -> List[str]:
+  def get_args(self, use_source_profile=False) -> List[str]:
     args = []
     if self.use_user_data_dir:
       if use_source_profile:
@@ -62,36 +70,39 @@ class Browser:
       processes.append(child)
     return processes
 
-
   def _get_source_profile(self) -> str:
-    dir = os.path.join(os.curdir, 'browser_profiles', platform.system(), self.name())
-    return os.path.abspath(dir)
+    profile = os.path.join(os.curdir, 'browser_profiles', platform.system(),
+                           self.name())
+    return os.path.abspath(profile)
 
   def _get_target_profile(self) -> str:
     if self.use_user_data_dir:
       if self.temp_user_data_dir is None:
-        self.temp_user_data_dir = TemporaryDirectory(prefix = self.name() + '-user-data-')
+        self.temp_user_data_dir = TemporaryDirectory(prefix=self.name() +
+                                                     '-user-data-')
       return self.temp_user_data_dir.name
     assert self.profile_dir()
     return self.profile_dir()
 
-  def prepare_profile(self, unsafe = False):
-      target_profile = self._get_target_profile()
-      if os.path.exists(target_profile):
-        if not self.use_user_data_dir and unsafe == False:
-          accept = input(f'Have you backup your profile {target_profile}? Type YES to delete it and continue.')
-          if accept != 'YES':
-            raise RuntimeError(f'Aborted by user')
-        shutil.rmtree(target_profile)
-      if not os.path.exists(self._get_source_profile()):
-        raise RuntimeError(f'Can\'t find source profile')
-      shutil.copytree(self._get_source_profile(), self._get_target_profile())
-
+  def prepare_profile(self, unsafe=False):
+    target_profile = self._get_target_profile()
+    if os.path.exists(target_profile):
+      if not self.use_user_data_dir and unsafe is False:
+        accept = input((f'Have you backup your profile {target_profile}?' +
+                        'Type YES to delete it and continue.'))
+        if accept != 'YES':
+          raise RuntimeError('Aborted by user')
+      shutil.rmtree(target_profile)
+    if not os.path.exists(self._get_source_profile()):
+      raise RuntimeError('Can\'t find source profile')
+    shutil.copytree(self._get_source_profile(), self._get_target_profile())
 
   def start(self, use_source_profile=False):
     assert self.process is None
     logging.debug(self.get_start_cmd(use_source_profile))
-    self.process = subprocess.Popen(self.get_start_cmd(use_source_profile), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    self.process = subprocess.Popen(self.get_start_cmd(use_source_profile),
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
 
   def terminate(self):
     assert self.process is not None
@@ -105,34 +116,48 @@ class Browser:
     if self.name() != 'Opera':
       assert rv == 0
 
+
 class _Chromium(Browser):
   browsertime_binary = 'chrome'
 
+
 class Brave(_Chromium):
   binary_name = 'Brave Browser'
+
   def binary_win(self) -> str:
-    return os.path.expandvars(Rf'%ProgramFiles%\BraveSoftware\Brave-Browser\Application\brave.exe')
+    return os.path.expandvars(
+        R'%ProgramFiles%\BraveSoftware\Brave-Browser\Application\brave.exe')
+
 
 class Chrome(_Chromium):
   binary_name = 'Google Chrome'
+
   def binary_win(self) -> str:
-    return os.path.expandvars(Rf'%ProgramFiles%\Google\Chrome\Application\chrome.exe')
+    return os.path.expandvars(
+        R'%ProgramFiles%\Google\Chrome\Application\chrome.exe')
+
 
 class ChromeUBO(Chrome):
   pass
 
+
 class Opera(_Chromium):
   binary_name = 'Opera'
   args = ['--ran-launcher']
+
   def binary_win(self) -> str:
-    return os.path.expandvars(R'%USERPROFILE%\AppData\Local\Programs\Opera\99.0.4788.13_0\opera.exe')
+    return os.path.expandvars(
+        R'%USERPROFILE%\AppData\Local\Programs\Opera\99.0.4788.13_0\opera.exe')
+
 
 class Edge(Browser):
   binary_name = 'Microsoft Edge'
   browsertime_binary = 'edge'
 
   def binary_win(self) -> str:
-    return os.path.expandvars(R'%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe')
+    return os.path.expandvars(
+        R'%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe')
+
 
 class Safari(Browser):
   binary_name = 'Safari'
@@ -154,13 +179,16 @@ class Firefox(Browser):
     if is_mac():
       return '~/Library/Application Support/Firefox/'
     if is_win():
-      return os.path.expandvars(R'%USERPROFILE%\AppData\Roaming\Mozilla\Firefox')
+      return os.path.expandvars(
+          R'%USERPROFILE%\AppData\Roaming\Mozilla\Firefox')
     raise RuntimeError('Not implemented')
 
   def binary_win(self) -> str:
     return os.path.expandvars(R'%ProgramW6432%\Mozilla Firefox\firefox.exe')
 
-BROWSER_LIST = [Brave, Chrome, ChromeUBO, Opera, Edge, Safari, Firefox]
+
+BROWSER_LIST = [Brave, Chrome, ChromeUBO, Opera, Edge]  # Safari, Firefox]
+
 
 def get_browsers_classes_by_name(name: str):
   if name == 'all':

@@ -50,7 +50,7 @@ class BrowsertimeMeasurement(Measurement):
         results.append(('fullyLoaded', domain, timings['fullyLoaded']['mean']))
         results.append(('largestContentfulPaint', domain, timings['largestContentfulPaint']['loadTime']['mean']))
         results.append(('loadEventEnd', domain, timings['loadEventEnd']['mean']))
-      with open(os.path.join(result_dir, 'browsertime.har'), 'r') as har:
+      with open(os.path.join(result_dir, 'browsertime.har',), 'r', encoding='utf-8') as har:
         total_bytes = 0
         data = json.load(har)
         for e in data['log']['entries']:

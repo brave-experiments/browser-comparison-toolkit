@@ -56,7 +56,7 @@ class BenchmarkMeasurement(Measurement):
         js_metrics = data[0]['extras'][0]
         for metric, value in js_metrics.items():
           results.append((metric, None, value))
-      # with open(os.path.join(result_dir, 'browsertime.har'), 'r') as har:
+      # with open(os.path.join(result_dir, 'browsertime.har'), 'r', encoding='utf-8') as har:
       #   total_bytes = 0
       #   data = json.load(har)
       #   for e in data['log']['entries']:

@@ -1,3 +1,8 @@
+# Copyright (c) 2023 The Brave Authors. All rights reserved.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at https://mozilla.org/MPL/2.0/.
+
 import platform
 import re
 import logging
@@ -6,35 +11,46 @@ import math
 import time
 import psutil
 
+from typing import List, Optional, Tuple, Type
+
 from components.browser import Browser
 from components.measurement import Measurement, MeasurementState
-from typing import Dict, List, Optional, Tuple, Type
+
 
 def _get_private_memory_usage_mac(pid: int) -> float:
   output = subprocess.run(
-        f'vmmap --summary {pid}' + '| grep "Physical footprint:"',
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        text=True,
-        shell=True).stdout
+      f'vmmap --summary {pid}' + '| grep "Physical footprint:"',
+      stderr=subprocess.PIPE,
+      stdout=subprocess.PIPE,
+      text=True,
+      check=False,  #TODO?
+      shell=True).stdout
   m = re.search('Physical footprint: *([\\d|.]*)(.)', output)
   assert m is not None
 
   val = float(m.group(1))
 
   assert len(m.group(2)) == 1
-  scale =  m.group(2)[0]
+  scale = m.group(2)[0]
 
   ex = ['K', 'M', 'G'].index(scale) + 1
-  mem = val * math.pow(1024,ex)
+  mem = val * math.pow(1024, ex)
   logging.debug('%d %f %s %d %f', pid, val, scale, ex, mem)
   return mem
 
+
 def _get_private_memory_usage_win(pid: int) -> float:
-  output = subprocess.check_output(['powershell.exe', '-Command', f'WmiObject -class Win32_PerfFormattedData_PerfProc_Process -filter "IDProcess like {pid}" | Select-Object -expand workingSetPrivate'], text=True)
+  output = subprocess.check_output([
+      'powershell.exe', '-Command',
+      ('WmiObject -class Win32_PerfFormattedData_PerfProc_Process'
+       f'-filter "IDProcess like {pid}" | ' +
+       'Select-Object -expand workingSetPrivate')
+  ],
+                                   text=True)
   pmf = float(output.rstrip())
-  assert(pmf > 0)
+  assert (pmf > 0)
   return pmf
+
 
 def _get_private_memory_usage(pid: int) -> float:
   if platform.system() == 'Darwin':
@@ -49,8 +65,9 @@ def _get_browser_private_memory_usage(browser: Browser) -> float:
   for p in browser.get_all_processes():
     logging.debug(p)
     if p.is_running() and p.status() != psutil.STATUS_ZOMBIE:
-      total +=_get_private_memory_usage(p.pid)
+      total += _get_private_memory_usage(p.pid)
   return total
+
 
 class MemoryMeasurement(Measurement):
   start_delay = 5
@@ -66,8 +83,9 @@ class MemoryMeasurement(Measurement):
       self.measure_delay = 5
       self.terminate_delay = 5
 
-
-  def Run(self, iteration: int, browser_class: Type[Browser]) -> List[Tuple[str, Optional[str], float]]:
+  def Run(
+      self, _,
+      browser_class: Type[Browser]) -> List[Tuple[str, Optional[str], float]]:
     browser = browser_class()
     try:
       browser.prepare_profile(self.state.unsafe_use_profiles)

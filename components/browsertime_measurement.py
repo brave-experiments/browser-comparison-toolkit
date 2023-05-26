@@ -44,7 +44,7 @@ class BrowsertimeMeasurement(Measurement):
       args.append(urls[i])
       logging.debug(args)
       subprocess.check_call(args)
-      with open(os.path.join(result_dir, 'browsertime.json'), 'r') as output:
+      with open(os.path.join(result_dir, 'browsertime.json'), 'r', encoding='utf-8') as output:
         data = json.load(output)
         timings = data[0]['statistics']['timings']
         results.append(('fullyLoaded', domain, timings['fullyLoaded']['mean']))

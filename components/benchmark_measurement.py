@@ -51,7 +51,7 @@ class BenchmarkMeasurement(Measurement):
       args.append(script)
       logging.debug(args)
       subprocess.check_call(args)
-      with open(os.path.join(result_dir, 'browsertime.json'), 'r') as output:
+      with open(os.path.join(result_dir, 'browsertime.json',), 'r', encoding='utf-8') as output:
         data = json.load(output)
         js_metrics = data[0]['extras'][0]
         for metric, value in js_metrics.items():

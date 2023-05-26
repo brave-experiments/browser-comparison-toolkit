@@ -30,7 +30,7 @@ def main():
   parser.add_argument('measure', type=str)
   parser.add_argument('browser', type=str)
   parser.add_argument('urls_file',
-                      type=argparse.FileType('r'),
+                      type=argparse.FileType('r', encoding='utf-8'),
                       help='File with urls to test')
   parser.add_argument('--connectivity_profile', type=str)
   parser.add_argument('--verbose', action='store_true')

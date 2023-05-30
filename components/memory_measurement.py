@@ -17,16 +17,17 @@ from components.browser import Browser
 from components.measurement import Measurement, MeasurementState
 
 
-def _get_private_memory_usage_mac(pid: int) -> float:
+def _get_private_memory_usage_mac(pid: int) -> Optional[float]:
   output = subprocess.run(
       f'vmmap --summary {pid}' + '| grep "Physical footprint:"',
       stderr=subprocess.PIPE,
       stdout=subprocess.PIPE,
       text=True,
-      check=False,  #TODO?
+      check=False,
       shell=True).stdout
   m = re.search('Physical footprint: *([\\d|.]*)(.)', output)
-  assert m is not None
+  if m is None:
+    return None
 
   val = float(m.group(1))
 
@@ -39,20 +40,22 @@ def _get_private_memory_usage_mac(pid: int) -> float:
   return mem
 
 
-def _get_private_memory_usage_win(pid: int) -> float:
-  output = subprocess.check_output([
+def _get_private_memory_usage_win(pid: int) -> Optional[float]:
+  args = [
       'powershell.exe', '-Command',
-      ('WmiObject -class Win32_PerfFormattedData_PerfProc_Process'
-       f'-filter "IDProcess like {pid}" | ' +
+      ('WmiObject -class Win32_PerfFormattedData_PerfProc_Process' +
+       f' -filter "IDProcess like {pid}" | ' +
        'Select-Object -expand workingSetPrivate')
-  ],
-                                   text=True)
-  pmf = float(output.rstrip())
+  ]
+  result = subprocess.run(args, stdout = subprocess.PIPE, text=True)
+  if result.returncode != 0:
+    return None
+  pmf = float(result.stdout.rstrip())
   assert (pmf > 0)
   return pmf
 
 
-def _get_private_memory_usage(pid: int) -> float:
+def _get_private_memory_usage(pid: int) -> Optional[float]:
   if platform.system() == 'Darwin':
     return _get_private_memory_usage_mac(pid)
   if platform.system() == 'Windows':
@@ -61,12 +64,14 @@ def _get_private_memory_usage(pid: int) -> float:
 
 
 def _get_browser_private_memory_usage(browser: Browser) -> float:
-  total: float = 0
+  total_private: float = 0
   for p in browser.get_all_processes():
     logging.debug(p)
     if p.is_running() and p.status() != psutil.STATUS_ZOMBIE:
-      total += _get_private_memory_usage(p.pid)
-  return total
+      private = _get_private_memory_usage(p.pid)
+      assert private is not None
+      total_private += private
+  return total_private
 
 
 class MemoryMeasurement(Measurement):

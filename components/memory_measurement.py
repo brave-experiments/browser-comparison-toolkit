@@ -93,23 +93,25 @@ class MemoryMeasurement(Measurement):
 
       assert browser.process is not None
       main_pid = browser.process.pid
-      total_private: float = 0
       gpu_private: float = 0
 
       main_memory_info =  psutil.Process(main_pid).memory_info()
-      main_rss = main_memory_info.rss
+      main_rss: float = main_memory_info.rss
       # main_uss = main_memory_info.uss
       main_private = _get_private_memory_usage(main_pid)
+      assert main_private is not None
+
+      total_private = main_private
       main_non_private = main_rss - main_private
+
       for p in browser.get_all_child_processes():
         logging.debug(p)
         if p.is_running() and p.status() != psutil.STATUS_ZOMBIE:
           private =  _get_private_memory_usage(p.pid)
+          assert private is not None
           total_private += private
           if p.cmdline().count('--type=gpu-process') > 0:
             gpu_private = private
-
-      assert total_private > 0
 
       metrics = [('TotalPrivateMemory', None, total_private),
               ('MainProcessPrivateMemory', None, main_private),

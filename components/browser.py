@@ -61,10 +61,10 @@ class Browser:
     args.extend(self.args)
     return args
 
-  def get_all_processes(self) -> List[psutil.Process]:
+  def get_all_child_processes(self) -> List[psutil.Process]:
     assert self.process is not None
     main_process = psutil.Process(self.process.pid)
-    processes = [main_process]
+    processes = []
     children = main_process.children(recursive=True)
     for child in children:
       processes.append(child)

@@ -63,17 +63,6 @@ def _get_private_memory_usage(pid: int) -> Optional[float]:
   raise RuntimeError('Platform is not supported')
 
 
-def _get_browser_private_memory_usage(browser: Browser) -> float:
-  total_private: float = 0
-  for p in browser.get_all_processes():
-    logging.debug(p)
-    if p.is_running() and p.status() != psutil.STATUS_ZOMBIE:
-      private = _get_private_memory_usage(p.pid)
-      assert private is not None
-      total_private += private
-  return total_private
-
-
 class MemoryMeasurement(Measurement):
   start_delay = 5
   open_url_delay = 5
@@ -92,6 +81,7 @@ class MemoryMeasurement(Measurement):
       self, _,
       browser_class: Type[Browser]) -> List[Tuple[str, Optional[str], float]]:
     browser = browser_class()
+    metrics = []
     try:
       browser.prepare_profile(self.state.unsafe_use_profiles)
       browser.start()
@@ -101,9 +91,37 @@ class MemoryMeasurement(Measurement):
         time.sleep(self.open_url_delay)
       time.sleep(self.measure_delay)
 
-      private_memory = _get_browser_private_memory_usage(browser)
-      assert private_memory > 0
+      assert browser.process is not None
+      main_pid = browser.process.pid
+      total_private: float = 0
+      gpu_private: float = 0
+
+      main_memory_info =  psutil.Process(main_pid).memory_info()
+      main_rss = main_memory_info.rss
+      # main_uss = main_memory_info.uss
+      main_private = _get_private_memory_usage(main_pid)
+      main_non_private = main_rss - main_private
+      for p in browser.get_all_child_processes():
+        logging.debug(p)
+        if p.is_running() and p.status() != psutil.STATUS_ZOMBIE:
+          private =  _get_private_memory_usage(p.pid)
+          total_private += private
+          if p.cmdline().count('--type=gpu-process') > 0:
+            gpu_private = private
+
+      assert total_private > 0
+
+      metrics = [('TotalPrivateMemory', None, total_private),
+              ('MainProcessPrivateMemory', None, main_private),
+              ]
+      if gpu_private > 0:
+         non_gpu_child_private = total_private - gpu_private - main_private
+         metrics.extend([('GpuProcessPrivate', None, gpu_private),
+                         ('NonGpuChildPrivate', None, non_gpu_child_private)])
+
+      metrics.append(('MainProcessNonPrivateMemory', None, main_non_private))
+
     finally:
       browser.terminate()
     time.sleep(self.terminate_delay)
-    return [('TotalPrivateMemory', None, private_memory)]
+    return metrics

@@ -1,6 +1,6 @@
 async function perfTest(context, commands) {
   await commands.measure.start(
-    'https://browserbench.org/Speedometer2.0/?iterationCount=10');
+    'https://browserbench.org/Speedometer2.1/?iterationCount=10');
   await commands.js.run('startTest()');
 
   while (true) {

@@ -10,7 +10,7 @@ import csv
 import statistics
 from typing import Dict, List, Optional, Tuple
 
-from components.browser import get_browsers_classes_by_name
+from components.browser import get_browser_classes_from_str
 from components.measurement import MeasurementState
 from components.benchmark_measurement import BenchmarkMeasurement
 from components.loading_measurement import LoadingMeasurement
@@ -115,7 +115,7 @@ def main():
   test_name: str = args.urls_file.name
   repeat: int = args.repeat
 
-  browser_classes = get_browsers_classes_by_name(args.browser)
+  browser_classes = get_browser_classes_from_str(args.browser)
   results = ResultMap()
 
   for browser_class in browser_classes:

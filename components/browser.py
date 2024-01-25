@@ -104,11 +104,18 @@ class Browser:
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
 
-  def terminate(self):
-    assert self.process is not None
+  def terminate(self, timeout = 10):
+    if self.process is None:
+      return
     self.process.terminate()
-    time.sleep(1)
-    self.process.kill()
+    time_spend = 0
+    while self.process.poll() is not None and time_spend < timeout:
+      time.sleep(1)
+      time_spend += 1
+
+    if self.process.poll() is not None:
+      logging.info('Killing %s pid %d', self.binary_name, self.process.pid)
+      self.process.kill()
 
   def open_url(self, url: str):
     assert self.process is not None
@@ -128,6 +135,33 @@ class Brave(_Chromium):
     return os.path.expandvars(
         R'%ProgramFiles%\BraveSoftware\Brave-Browser\Application\brave.exe')
 
+class BraveBeta(_Chromium):
+  binary_name = 'Brave Browser Beta'
+
+  def binary_win(self) -> str:
+    return os.path.expandvars(
+        R'%ProgramFiles%\BraveSoftware\Brave-Browser-Beta\Application\brave.exe')
+
+class BraveNightly(_Chromium):
+  binary_name = 'Brave Browser Nightly'
+
+  def binary_win(self) -> str:
+    return os.path.expandvars(
+        R'%ProgramFiles%\BraveSoftware\Brave-Browser-Nightly\Application\brave.exe')
+
+
+class DDG(Browser):
+  binary_name = 'DuckDuckGo'
+  use_user_data_dir = False
+
+  def binary_win(self) -> str:
+    return os.path.expandvars(
+        R'%ProgramFiles%\WindowsApps\DuckDuckGo.DesktopBrowser_0.63.3.0_x64__ya2fgkz3nks94\WindowsBrowser\DuckDuckGo.exe')
+
+  def profile_dir(self) -> str:
+    if is_mac():
+      return '~/Library/Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/'
+    raise RuntimeError('Not implemented')
 
 class Chrome(_Chromium):
   binary_name = 'Google Chrome'
@@ -187,13 +221,20 @@ class Firefox(Browser):
     return os.path.expandvars(R'%ProgramW6432%\Mozilla Firefox\firefox.exe')
 
 
-BROWSER_LIST = [Brave, Chrome, ChromeUBO, Opera, Edge]  # Safari, Firefox]
+#BraveBeta,
+BROWSER_LIST = [Brave,  BraveNightly, Chrome, ChromeUBO, Opera, Edge, Firefox]  #  DDG, Safari, Firefox]
+BROWSER_LIST_MAP = {}
+for b in BROWSER_LIST:
+  BROWSER_LIST_MAP[b.name()] = b
 
-
-def get_browsers_classes_by_name(name: str):
+def get_browser_classes_from_str(name: str):
   if name == 'all':
     return BROWSER_LIST
-  for b in BROWSER_LIST:
-    if b.name() == name:
-      return [b]
-  raise RuntimeError(f'No browser with name {name} found')
+  result: List[Browser] = []
+  for b in name.split(','):
+    cls = BROWSER_LIST_MAP.get(b)
+    if cls is None:
+      raise RuntimeError(f'No browser with name {b} found')
+    result.append(cls)
+
+  return result

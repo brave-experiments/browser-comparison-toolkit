@@ -4,3 +4,5 @@
 results/
 browser_profiles/
 browsertime/
+browsertime-results/
+__pycache__

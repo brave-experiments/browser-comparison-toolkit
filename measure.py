@@ -81,16 +81,16 @@ class ResultMap():
                                  quotechar='"',
                                  quoting=csv.QUOTE_NONNUMERIC)
       if not append:
-        result_writer.writerow(['Metric_name', 'Browser'] + ['value'] * repeat +
-                              ['avg', 'stdev', 'stdev%'])
+        result_writer.writerow(['Metric', 'Browser'] +
+                              ['avg', 'stdev', 'stdev%', '', 'raw_values..'])
       for (metric, key), results in self._map.items():
         metric_str = metric + '_' + key if key is not None else metric
         for browser_spec, values in results.items():
           avg = statistics.fmean(values)
           stdev = statistics.stdev(values) if len(values) > 1 else 0
           rstdev = stdev / avg if avg > 0 else 0
-          result_writer.writerow([metric_str, browser_spec] + values +
-                                 [avg, stdev, rstdev])
+          result_writer.writerow([metric_str, browser_spec] +
+                                 [avg, stdev, rstdev] + [''] + values)
 
 
 def main():

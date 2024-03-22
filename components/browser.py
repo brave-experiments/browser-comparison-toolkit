@@ -191,7 +191,7 @@ class Opera(_Chromium):
         R'%USERPROFILE%\AppData\Local\Programs\Opera\99.0.4788.13_0\opera.exe')
 
   def get_spec(self) -> str:
-    return 'Opera ' + self.get_spec()
+    return 'Opera ' + super().get_spec()
 
 class Edge(Browser):
   binary_name = 'Microsoft Edge'

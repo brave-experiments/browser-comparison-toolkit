@@ -188,7 +188,7 @@ class Opera(_Chromium):
 
   def binary_win(self) -> str:
     return os.path.expandvars(
-        R'%USERPROFILE%\AppData\Local\Programs\Opera\99.0.4788.13_0\opera.exe')
+        R'%USERPROFILE%\AppData\Local\Programs\Opera\opera.exe')
 
   def get_spec(self) -> str:
     return 'Opera ' + super().get_spec()
@@ -236,6 +236,20 @@ class Firefox(Browser):
   def binary_win(self) -> str:
     return os.path.expandvars(R'%ProgramW6432%\Mozilla Firefox\firefox.exe')
 
+  def terminate(self, timeout = 10):
+    if is_win():
+      subprocess.check_call(['taskkill.exe', '/F', '/IM', 'firefox.exe'])
+    else:
+      super().terminate(timeout)
+
+  def get_all_child_processes(self) -> List[psutil.Process]:
+    if is_win():
+      processes = []
+      for proc in psutil.process_iter():
+        if proc.name() == 'firefox.exe':
+          processes.append(proc)
+      return processes
+    return super().get_all_child_processes()
 
 #BraveBeta,
 BROWSER_LIST = [Brave,  BraveNightly, Chrome, ChromeUBO, Opera, Edge, Firefox]  #  DDG, Safari, Firefox]

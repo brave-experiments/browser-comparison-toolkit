@@ -36,15 +36,15 @@ class ResultMap():
   #  Dict[Tuple[metric, key], Dict[browser_name, metric_values]]
   _map: Dict[Tuple[str, Optional[str]], Dict[str, List[float]]] = {}
 
-  def addValue(self, browser_name: str, metric: str, key: Optional[str],
+  def addValue(self, browser_spec: str, metric: str, key: Optional[str],
                value: float):
     metric_results = self._map.get((metric, key))
     if metric_results is None:
       metric_results = self._map[(metric, key)] = {}
 
-    values = metric_results.get(browser_name)
+    values = metric_results.get(browser_spec)
     if values is None:
-      values = metric_results[browser_name] = []
+      values = metric_results[browser_spec] = []
 
     values.append(value)
 
@@ -59,10 +59,10 @@ class ResultMap():
       total_per_browser = total_metrics.get(total_metric_name)
       if total_per_browser is None:
         total_per_browser = total_metrics[total_metric_name] = {}
-      for browser_name, values in results.items():
-        total_values = total_per_browser.get(browser_name)
+      for browser_spec, values in results.items():
+        total_values = total_per_browser.get(browser_spec)
         if total_values is None:
-          total_values = total_per_browser[browser_name] = []
+          total_values = total_per_browser[browser_spec] = []
 
         if len(total_values) < len(values):
           total_values += [0] * (len(values) - len(total_values))
@@ -83,11 +83,11 @@ class ResultMap():
                              ['avg', 'stdev', 'stdev%'])
       for (metric, key), results in self._map.items():
         metric_str = metric + '_' + key if key is not None else metric
-        for browser_name, values in results.items():
+        for browser_spec, values in results.items():
           avg = statistics.fmean(values)
           stdev = statistics.stdev(values) if len(values) > 1 else 0
           rstdev = stdev / avg if avg > 0 else 0
-          result_writer.writerow([metric_str, browser_name] + values +
+          result_writer.writerow([metric_str, browser_spec] + values +
                                  [avg, stdev, rstdev])
 
 
@@ -119,13 +119,14 @@ def main():
   results = ResultMap()
 
   for browser_class in browser_classes:
-    browser_name = browser_class.name()
+    browser_spec = browser_class().get_spec()
+    logging.info('Testing %s', browser_spec)
 
     for iteration in range(repeat):
       metrics = measure.Run(iteration, browser_class)
-      logging.debug([test_name, browser_name, metrics])
+      logging.debug([test_name, browser_spec, metrics])
       for metric, key, value in metrics:
-        results.addValue(browser_name, metric, key, value)
+        results.addValue(browser_spec, metric, key, value)
     results.write_csv(args.output, args.repeat)
 
 

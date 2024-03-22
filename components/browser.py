@@ -33,6 +33,9 @@ class Browser:
   def profile_dir(self) -> str:
     raise RuntimeError('Not implemented')
 
+  def get_spec(self) -> str:
+    return subprocess.check_output([self.binary(), '--version']).decode('utf-8').rstrip()
+
   def binary(self) -> str:
     if is_mac():
       return self.binary_mac()
@@ -163,6 +166,10 @@ class DDG(Browser):
       return '~/Library/Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/'
     raise RuntimeError('Not implemented')
 
+  def get_spec(self) -> str:
+    return self.name()
+
+
 class Chrome(_Chromium):
   binary_name = 'Google Chrome'
 
@@ -183,6 +190,8 @@ class Opera(_Chromium):
     return os.path.expandvars(
         R'%USERPROFILE%\AppData\Local\Programs\Opera\99.0.4788.13_0\opera.exe')
 
+  def get_spec(self) -> str:
+    return 'Opera ' + self.get_spec()
 
 class Edge(Browser):
   binary_name = 'Microsoft Edge'
@@ -202,6 +211,13 @@ class Safari(Browser):
     if is_mac():
       return '~/Library/Safari'
     raise RuntimeError('Not implemented')
+
+  def get_spec(self) -> str:
+    args = ['/usr/libexec/PlistBuddy',
+            '-c',
+            'print :CFBundleShortVersionString',
+            '/Applications/Safari.app/Contents/Info.plist']
+    return 'Safari '+ subprocess.check_output(args).decode('utf-8').strip()
 
 
 class Firefox(Browser):

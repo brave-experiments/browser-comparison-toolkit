@@ -19,7 +19,7 @@ async function perfTest(context, commands) {
   await start(commands);
   await waitForResults(commands);
 
-  await commands.measure.start(`${URL}?iterationCount=2`);
+  await commands.measure.start(`${URL}?iterationCount=100`);
   await start(commands);
   const value = await waitForResults(commands);
 

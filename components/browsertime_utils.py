@@ -8,7 +8,7 @@ import os
 import logging
 import subprocess
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from components.browser import Browser
 from components.utils import is_win
@@ -22,7 +22,7 @@ DEFAULT_CHROME_OPTIONS = [
   '--remote-debugging-port=9222']
 
 def run_browsertime(browser: Browser, cmd: str, result_dir: str,
-                    extra_args: List[str]) -> Tuple[Dict, Dict | None]:
+                    extra_args: List[str]) -> Tuple[Dict, Optional[Dict]]:
   npm_binary = 'npm.cmd' if is_win() else 'npm'
   args = ([npm_binary, 'exec', 'browsertime', '--'] +
           ['-b', browser.browsertime_binary] + ['-n', '1'] +

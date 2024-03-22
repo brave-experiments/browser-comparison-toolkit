@@ -72,15 +72,17 @@ class ResultMap():
     for (metric, per_browser_map) in total_metrics.items():
       self._map[(metric, None)] = per_browser_map
 
-  def write_csv(self, output_file: str, repeat: int):
+  def write_csv(self, output_file: str, repeat: int, append: bool):
     self.calc_total_metrics()
-    with open(output_file, 'w', newline='', encoding='utf-8') as result_file:
+    mode = 'a' if append else 'w'
+    with open(output_file, mode, newline='', encoding='utf-8') as result_file:
       result_writer = csv.writer(result_file,
                                  delimiter=',',
                                  quotechar='"',
                                  quoting=csv.QUOTE_NONNUMERIC)
-      result_writer.writerow(['Metric_name', 'Browser'] + ['value'] * repeat +
-                             ['avg', 'stdev', 'stdev%'])
+      if not append:
+        result_writer.writerow(['Metric_name', 'Browser'] + ['value'] * repeat +
+                              ['avg', 'stdev', 'stdev%'])
       for (metric, key), results in self._map.items():
         metric_str = metric + '_' + key if key is not None else metric
         for browser_spec, values in results.items():
@@ -104,6 +106,7 @@ def main():
   parser.add_argument('--repeat', type=int, default=1)
   parser.add_argument('--low-delays-for-testing', action='store_true')
   parser.add_argument('--output', type=str, default='results.csv')
+  parser.add_argument('--append', action='store_true')
 
   args = parser.parse_args()
 
@@ -127,7 +130,7 @@ def main():
       logging.debug([test_name, browser_spec, metrics])
       for metric, key, value in metrics:
         results.addValue(browser_spec, metric, key, value)
-    results.write_csv(args.output, args.repeat)
+    results.write_csv(args.output, args.repeat, args.append)
 
 
 main()
